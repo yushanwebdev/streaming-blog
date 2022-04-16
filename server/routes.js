@@ -92,6 +92,7 @@ router.get(
 );
 
 router.get("/sw.js", (req, res) => {
+  res.set("Content-Type", "application/javascript");
   const input = fs.createReadStream(`${__dirname}/../client/sw.js`);
   input.pipe(res);
 });
