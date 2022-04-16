@@ -91,6 +91,11 @@ router.get(
   })
 );
 
+router.get("/sw.js", (req, res) => {
+  const input = fs.createReadStream(`${__dirname}/../client/sw.js`);
+  input.pipe(res);
+});
+
 // Handle errors
 router.use((err, req, res, next) => {
   if (!(err instanceof Error404)) {
