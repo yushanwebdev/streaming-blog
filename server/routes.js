@@ -94,7 +94,21 @@ router.get(
 router.get("/sw.js", (req, res) => {
   res.set("Content-Type", "application/javascript");
   const input = fs.createReadStream(`${__dirname}/../client/sw.js`);
-  input.pipe(res);
+  const toCache = [
+    "/static/offline.html",
+    "/static/css/all.css",
+    "/static/imgs/me.jpg",
+    "/static/css/imgs/social-icons.png",
+  ].map((url) => rev.get(url));
+
+  input
+    .pipe(
+      staticModule({
+        "static-to-cache": () => JSON.stringify(toCache, null, " "),
+        "static-rev-get": (url) => JSON.stringify(rev.get(url)),
+      })
+    )
+    .pipe(res);
 });
 
 // Handle errors
