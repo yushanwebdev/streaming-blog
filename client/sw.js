@@ -1,11 +1,14 @@
 const toCache = require("static-to-cache")();
 const revGet = require("static-rev-get");
+const version = require("static-version")();
+
+const cacheName = `static-${version}`;
 
 addEventListener("install", (event) => {
   skipWaiting();
   event.waitUntil(
     (async function () {
-      const cache = await caches.open("static");
+      const cache = await caches.open(cacheName);
       await cache.addAll(toCache);
     })()
   );

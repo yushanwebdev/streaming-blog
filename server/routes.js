@@ -101,11 +101,16 @@ router.get("/sw.js", (req, res) => {
     "/static/css/imgs/social-icons.png",
   ].map((url) => rev.get(url));
 
+  const hash = crypto.createHash("md5");
+  toCache.forEach((url) => hash.update(url));
+  const version = hash.digest("hex");
+
   input
     .pipe(
       staticModule({
         "static-to-cache": () => JSON.stringify(toCache, null, " "),
         "static-rev-get": (url) => JSON.stringify(rev.get(url)),
+        "static-version": () => JSON.stringify(version),
       })
     )
     .pipe(res);
