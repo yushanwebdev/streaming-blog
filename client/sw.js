@@ -14,6 +14,17 @@ addEventListener("install", (event) => {
   );
 });
 
+addEventListener("activate", (event) => {
+  event.waitUntil(
+    (async function () {
+      const keys = await caches.keys();
+      for (const key of keys) {
+        if (key !== cacheName) await caches.delete(key);
+      }
+    })()
+  );
+});
+
 addEventListener("fetch", (event) => {
   event.respondWith(
     (async function () {
