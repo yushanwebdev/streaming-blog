@@ -26,7 +26,35 @@ addEventListener("activate", (event) => {
 });
 
 function streamArticle(event, url) {
-  return new Response("this is an article");
+  const includeUrl = new URL(url);
+  includeUrl.pathname += "include";
+
+  const parts = [
+    caches.match(revGet("/static/shell-start.html")),
+    fetch(includeUrl),
+    caches.match(revGet("/static/shell-end.html")),
+  ];
+
+  const { readable, writable } = new TransformStream();
+
+  event.waitUntil(
+    (async function () {
+      for (const responsePromise of parts) {
+        const response = await responsePromise;
+        await response.body.pipeTo(writable, {
+          preventClose: true,
+        });
+      }
+
+      writable.getWriter().close();
+    })()
+  );
+
+  return new Response(readable, {
+    headers: {
+      "Content-Type": "text/html; charset=utf-8",
+    },
+  });
 }
 
 addEventListener("fetch", (event) => {
