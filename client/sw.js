@@ -25,9 +25,22 @@ addEventListener("activate", (event) => {
   );
 });
 
+function streamArticle(event, url) {
+  return new Response("this is an article");
+}
+
 addEventListener("fetch", (event) => {
+  const url = new URL(event.request.url);
+
   event.respondWith(
     (async function () {
+      if (
+        url.origin === location.origin &&
+        /^\/\d{4}\/[^\/]+\/$/.test(url.pathname)
+      ) {
+        return streamArticle(event, url);
+      }
+
       const cachedResponse = await caches.match(event.request);
 
       if (cachedResponse) return cachedResponse;
